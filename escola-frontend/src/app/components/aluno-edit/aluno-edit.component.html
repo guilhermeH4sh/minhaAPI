@@ -1,0 +1,94 @@
+<div class="header-container">
+  <h1>Editar Aluno</h1>
+  <p class="subtitle">Atualize o cadastro do estudante e gerencie as disciplinas matriculadas.</p>
+</div>
+
+<!-- Carregando -->
+<div *ngIf="isLoading" class="loader-container">
+  <div class="spinner"></div>
+  <p>Carregando dados...</p>
+</div>
+
+<!-- Banners de Sucesso ou Erro -->
+<div *ngIf="successMessage" class="banner success-banner">
+  <p>{{ successMessage }} Redirecionando...</p>
+</div>
+
+<div *ngIf="errorMessage" class="banner error-banner">
+  <p>{{ errorMessage }}</p>
+</div>
+
+<!-- Formulario de Edicao -->
+<form *ngIf="!isLoading && aluno" (ngSubmit)="salvar()" #form="ngForm" class="edit-form-container">
+  
+  <div class="form-card glass-panel">
+    <h3>Dados do Aluno</h3>
+    
+    <div class="form-row">
+      <div class="form-group col-ra">
+        <label for="ra">Registro Acadêmico (RA)</label>
+        <input type="text" id="ra" name="ra" [value]="aluno.ra" readonly class="readonly-input">
+        <small class="help-text">O RA não pode ser alterado.</small>
+      </div>
+
+      <div class="form-group col-nome">
+        <label for="nome">Nome Completo</label>
+        <input type="text" id="nome" name="nome" [(ngModel)]="aluno.nome" required placeholder="Nome do aluno" #nomeInput="ngModel" [class.is-invalid]="nomeInput.invalid && nomeInput.touched">
+        <div *ngIf="nomeInput.invalid && nomeInput.touched" class="validation-error">
+          O nome é obrigatório.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card glass-panel">
+    <div class="card-header-flex">
+      <h3>Disciplinas</h3>
+      <button type="button" class="btn-add-disc" (click)="adicionarDisciplina()">
+        Adicionar Disciplina
+      </button>
+    </div>
+
+    <div *ngIf="aluno.disciplinas.length === 0" class="empty-disciplines">
+      Nenhuma disciplina matriculada. Clique em "Adicionar Disciplina" acima.
+    </div>
+
+    <div *ngIf="aluno.disciplinas.length > 0" class="disciplines-edit-list">
+      
+      <div *ngFor="let disc of aluno.disciplinas; let i = index" class="disc-edit-row">
+        
+        <div class="input-col code-col">
+          <label [for]="'code-' + i">Código</label>
+          <input type="text" [id]="'code-' + i" [name]="'code-' + i" [(ngModel)]="disc.codigo" required placeholder="ex: MAT101">
+        </div>
+
+        <div class="input-col name-col">
+          <label [for]="'name-' + i">Nome da disciplina</label>
+          <input type="text" [id]="'name-' + i" [name]="'name-' + i" [(ngModel)]="disc.nome" required placeholder="ex: Matemática">
+        </div>
+
+        <div class="input-col prof-col">
+          <label [for]="'prof-' + i">Professor</label>
+          <input type="text" [id]="'prof-' + i" [name]="'prof-' + i" [(ngModel)]="disc.professor" required placeholder="ex: Prof. Ana">
+        </div>
+
+        <div class="delete-col">
+          <button type="button" class="btn-delete-row" (click)="removerDisciplina(i)" title="Remover">
+            Remover
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Botoes de Acao -->
+  <div class="form-actions-footer">
+    <a [routerLink]="['/alunos', ra]" class="btn-form cancel">Cancelar</a>
+    <button type="submit" class="btn-form save" [disabled]="form.invalid || isSaving">
+      {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
+    </button>
+  </div>
+
+</form>

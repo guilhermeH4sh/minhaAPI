@@ -1,0 +1,48 @@
+<div class="header-container">
+  <h1>Lista de Alunos</h1>
+  <p class="subtitle">Consulte e gerencie as informações dos alunos e suas disciplinas.</p>
+</div>
+
+<!-- Carregando -->
+<div *ngIf="isLoading" class="loader-container">
+  <div class="spinner"></div>
+  <p>Carregando dados...</p>
+</div>
+
+<!-- Painel de Erro -->
+<div *ngIf="errorMessage" class="error-panel">
+  <h3>Erro ao carregar</h3>
+  <p>{{ errorMessage }}</p>
+  <button (click)="carregarAlunos()" class="btn-retry">Tentar novamente</button>
+</div>
+
+<!-- Grid de Alunos -->
+<div *ngIf="!isLoading && !errorMessage" class="alunos-grid">
+  
+  <div *ngIf="alunos.length === 0" class="empty-state">
+    <p>Nenhum aluno cadastrado.</p>
+  </div>
+
+  <div *ngFor="let aluno of alunos" class="aluno-card">
+    <div class="card-header">
+      <span class="ra-badge">RA: {{ aluno.ra }}</span>
+    </div>
+    
+    <div class="card-body">
+      <h3>{{ aluno.nome }}</h3>
+      <p class="disciplines-count">
+        Disciplinas matriculadas: {{ aluno.disciplinas.length || 0 }}
+      </p>
+    </div>
+
+    <div class="card-actions">
+      <a [routerLink]="['/alunos', aluno.ra]" class="action-btn detail-btn">
+        Detalhes
+      </a>
+      <a [routerLink]="['/alunos', aluno.ra, 'editar']" class="action-btn edit-btn">
+        Editar
+      </a>
+    </div>
+  </div>
+
+</div>

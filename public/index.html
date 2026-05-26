@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Escolar & Usuários</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --secondary: #3b82f6;
+            --secondary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: rgba(30, 41, 59, 0.4);
+            padding: 0.5rem;
+            border-radius: 2rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: auto;
+            margin: 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .tab-btn.active.alunos {
+            background: var(--secondary);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1.1fr 1.4fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        h1, h2 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #34d399, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1 { font-size: 1.8rem; }
+        h2 { font-size: 1.5rem; }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            accent-color: var(--primary);
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            color: var(--text-main);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+        }
+
+        .aluno-mode input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .aluno-btn {
+            background-color: var(--secondary);
+        }
+
+        .aluno-btn:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .btn-cancel:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .user-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .user-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .aluno-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .user-info h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .user-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 700;
+        }
+
+        .badge.active {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .badge.inactive {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin: 0;
+        }
+
+        .edit-btn {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+        
+        .edit-btn:hover { background-color: var(--secondary); color: white; transform: none; }
+
+        .delete-btn {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .delete-btn:hover { background-color: var(--danger); color: white; transform: none; }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .list-container {
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .list-container::-webkit-scrollbar { width: 6px; }
+        .list-container::-webkit-scrollbar-track { background: transparent; }
+        .list-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        .list-container::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Estilos específicos para disciplinas dinâmicas */
+        .disciplinas-container {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.4);
+            margin-top: 0.5rem;
+        }
+
+        .disciplina-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .disciplina-row input {
+            padding: 0.55rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-add-disc {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px dashed rgba(59, 130, 246, 0.4);
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .btn-add-disc:hover {
+            background-color: rgba(59, 130, 246, 0.3);
+            transform: none;
+        }
+
+        .btn-remove-disc {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            margin-top: 0;
+        }
+
+        .btn-remove-disc:hover {
+            background: var(--danger);
+            color: white;
+            transform: none;
+        }
+
+        .disc-pill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.35rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .disc-pill-code {
+            font-weight: 700;
+            color: #34d399;
+            margin-right: 0.5rem;
+        }
+
+        .disc-pill-name {
+            font-weight: 600;
+            color: var(--text-main);
+            flex-grow: 1;
+        }
+
+        .disc-pill-prof {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+
+        .search-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .search-wrapper input {
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .search-wrapper button {
+            width: auto;
+            margin-top: 0;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-users">👥 Usuários</button>
+        <button class="tab-btn" id="tab-alunos">🎓 Alunos & Disciplinas</button>
+    </div>
+
+    <div class="container">
+        <!-- PAINEL DA ESQUERDA: FORMULÁRIOS -->
+        <div class="glass-panel" id="form-panel">
+            
+            <!-- FORMULÁRIO DE USUÁRIO -->
+            <div id="user-section-form">
+                <h1 id="form-title">Novo Usuário</h1>
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+                    
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" placeholder="Ex: Maria Souza" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" placeholder="Ex: maria@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" placeholder="Sua senha secreta" required>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="ativo" checked>
+                        <label for="ativo">Usuário Ativo</label>
+                    </div>
+
+                    <button type="submit" id="submit-btn">Criar Usuário</button>
+                    <button type="button" class="btn-cancel" id="cancel-btn" style="display: none;">Cancelar</button>
+                </form>
+            </div>
+
+            <!-- FORMULÁRIO DE ALUNO (PUT /alunos/:ra) -->
+            <div id="aluno-section-form" style="display: none;" class="aluno-mode">
+                <h1 id="aluno-form-title">Atualizar Aluno</h1>
+                <form id="aluno-form">
+                    <div class="form-group">
+                        <label for="aluno-ra">RA do Aluno (Identificador)</label>
+                        <input type="text" id="aluno-ra" placeholder="Ex: 1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="aluno-nome">Nome do Aluno</label>
+                        <input type="text" id="aluno-nome" placeholder="Ex: João Silva" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Disciplinas Matriculadas</label>
+                        <div class="disciplinas-container">
+                            <div id="disciplinas-list-fields">
+                                <!-- Campos dinâmicos de disciplina aparecerão aqui -->
+                            </div>
+                            <button type="button" class="btn-add-disc" id="btn-add-disciplina">+ Adicionar Disciplina</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="aluno-submit-btn" class="aluno-btn">Salvar Alterações</button>
+                    <button type="button" class="btn-cancel" id="aluno-cancel-btn" style="display: none;">Cancelar / Limpar</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- PAINEL DA DIREITA: LISTAGENS -->
+        <div class="glass-panel">
+            
+            <!-- LISTA DE USUÁRIOS -->
+            <div id="user-section-list">
+                <h2>Usuários do Sistema</h2>
+                <div id="users-list" class="list-container">
+                    <div class="empty-state">Carregando usuários...</div>
+                </div>
+            </div>
+
+            <!-- LISTA DE ALUNOS -->
+            <div id="aluno-section-list" style="display: none;">
+                <h2>Alunos Cadastrados</h2>
+                
+                <!-- Busca de Aluno por RA (GET /alunos/:ra) -->
+                <div class="search-wrapper">
+                    <input type="text" id="search-ra" placeholder="Buscar por RA do aluno...">
+                    <button id="btn-search-ra" class="aluno-btn">Buscar</button>
+                    <button id="btn-clear-search" class="btn-cancel">Limpar</button>
+                </div>
+
+                <div id="alunos-list" class="list-container">
+                    <div class="empty-state">Carregando alunos...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const USER_API_URL = '/users';
+        const ALUNO_API_URL = '/alunos';
+        
+        // Elementos de Troca de Abas
+        const tabUsers = document.getElementById('tab-users');
+        const tabAlunos = document.getElementById('tab-alunos');
+        const userSectionForm = document.getElementById('user-section-form');
+        const userSectionList = document.getElementById('user-section-list');
+        const alunoSectionForm = document.getElementById('aluno-section-form');
+        const alunoSectionList = document.getElementById('aluno-section-list');
+
+        // Alternância de Abas
+        tabUsers.addEventListener('click', () => {
+            tabUsers.classList.add('active');
+            tabAlunos.classList.remove('active');
+            userSectionForm.style.display = 'block';
+            userSectionList.style.display = 'block';
+            alunoSectionForm.style.display = 'none';
+            alunoSectionList.style.display = 'none';
+            resetForm();
+            fetchUsers();
+        });
+
+        tabAlunos.addEventListener('click', () => {
+            tabAlunos.classList.add('active');
+            tabAlunos.classList.add('alunos');
+            tabUsers.classList.remove('active');
+            userSectionForm.style.display = 'none';
+            userSectionList.style.display = 'none';
+            alunoSectionForm.style.display = 'block';
+            alunoSectionList.style.display = 'block';
+            resetAlunoForm();
+            fetchAlunos();
+        });
+
+        // -------------------------------------------------------------
+        // LOGICA DE USUÁRIOS
+        // -------------------------------------------------------------
+        const form = document.getElementById('user-form');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const listContainer = document.getElementById('users-list');
+        
+        const idInput = document.getElementById('user-id');
+        const nomeInput = document.getElementById('nome');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const ativoInput = document.getElementById('ativo');
+
+        let isEditing = false;
+
+        async function fetchUsers() {
+            try {
+                const res = await fetch(USER_API_URL);
+                const users = await res.json();
+                renderUsers(users);
+            } catch (error) {
+                listContainer.innerHTML = '<div class="empty-state">Erro ao conectar com o banco MongoDB. Verifique o servidor.</div>';
+            }
+        }
+
+        function renderUsers(users) {
+            listContainer.innerHTML = '';
+            
+            if (!Array.isArray(users)) return;
+
+            if (users.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state">Nenhum usuário cadastrado ainda.</div>';
+                return;
+            }
+
+            users.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                
+                const statusBadge = u.ativo 
+                    ? '<span class="badge active">Ativo</span>' 
+                    : '<span class="badge inactive">Inativo</span>';
+
+                const nomeSeguro = u.nome.replace(/'/g, "\\'");
+                const emailSeguro = u.email.replace(/'/g, "\\'");
+                const senhaSegura = (u.senha || '').replace(/'/g, "\\'");
+
+                card.innerHTML = `
+                    <div class="user-info">
+                        <h3>${u.nome} ${statusBadge}</h3>
+                        <p>${u.email}</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn edit-btn" onclick="editUser('${u._id}', '${nomeSeguro}', '${emailSeguro}', '${senhaSegura}', ${u.ativo})" title="Editar">✎</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('${u._id}')" title="Excluir">✕</button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                nome: nomeInput.value,
+                email: emailInput.value,
+                senha: senhaInput.value,
+                ativo: ativoInput.checked
+            };
+
+            try {
+                if (isEditing) {
+                    await fetch(`${USER_API_URL}/${idInput.value}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    await fetch(USER_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
+                resetForm();
+                fetchUsers();
+            } catch (error) {
+                alert("Erro ao salvar usuário. O MongoDB está rodando?");
+            }
+        });
+
+        async function deleteUser(id) {
+            if (confirm("Tem certeza que deseja excluir este usuário?")) {
+                try {
+                    await fetch(`${USER_API_URL}/${id}`, { method: 'DELETE' });
+                    fetchUsers();
+                    
+                    if (isEditing && idInput.value === id) {
+                        resetForm();
+                    }
+                } catch (error) {
+                    alert("Erro ao excluir usuário.");
+                }
+            }
+        }
+
+        window.editUser = (id, nome, email, senha, ativo) => {
+            isEditing = true;
+            idInput.value = id;
+            nomeInput.value = nome;
+            emailInput.value = email;
+            senhaInput.value = senha;
+            ativoInput.checked = ativo;
+            
+            formTitle.textContent = "Editar Usuário";
+            submitBtn.textContent = "Salvar Alterações";
+            cancelBtn.style.display = "block";
+        };
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        function resetForm() {
+            isEditing = false;
+            form.reset();
+            idInput.value = '';
+            
+            formTitle.textContent = "Novo Usuário";
+            submitBtn.textContent = "Criar Usuário";
+            cancelBtn.style.display = "none";
+        }
+
+        // -------------------------------------------------------------
+        // LOGICA DE ALUNOS
+        // -------------------------------------------------------------
+        const alunoForm = document.getElementById('aluno-form');
+        const alunoFormTitle = document.getElementById('aluno-form-title');
+        const alunoSubmitBtn = document.getElementById('aluno-submit-btn');
+        const alunoCancelBtn = document.getElementById('aluno-cancel-btn');
+        const alunosListContainer = document.getElementById('alunos-list');
+        
+        const alunoRaInput = document.getElementById('aluno-ra');
+        const alunoNomeInput = document.getElementById('aluno-nome');
+        const disciplinasListFields = document.getElementById('disciplinas-list-fields');
+        const btnAddDisciplina = document.getElementById('btn-add-disciplina');
+        
+        const searchRaInput = document.getElementById('search-ra');
+        const btnSearchRa = document.getElementById('btn-search-ra');
+        const btnClearSearch = document.getElementById('btn-clear-search');
+
+        let activeDisciplines = [];
+        let isEditingAluno = false;
+
+        async function fetchAlunos() {
+            try {
+                const res = await fetch(ALUNO_API_URL);
+                const alunos = await res.json();
+                renderAlunos(alunos);
+            } catch (error) {
+                alunosListContainer.innerHTML = '<div class="empty-state">Erro ao conectar com o banco MongoDB. Verifique o servidor.</div>';
+            }
+        }
+
+        function renderAlunos(alunos) {
+            alunosListContainer.innerHTML = '';
+            
+            if (!Array.isArray(alunos)) return;
+
+            if (alunos.length === 0) {
+                alunosListContainer.innerHTML = '<div class="empty-state">Nenhum aluno cadastrado ainda.</div>';
+                return;
+            }
+
+            alunos.forEach(aluno => {
+                const card = document.createElement('div');
+                card.className = 'user-card aluno-card';
+                card.style.flexDirection = 'column';
+                card.style.alignItems = 'stretch';
+                card.style.gap = '0.75rem';
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="user-info">
+                            <h3>${aluno.nome} <span class="badge active" style="background-color: rgba(59, 130, 246, 0.2); color: #60a5fa;">RA: ${aluno.ra}</span></h3>
+                        </div>
+                        <div class="user-actions">
+                            <button class="action-btn edit-btn" onclick="editAluno('${aluno.ra}')" title="Editar Aluno">✎</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+                        <button onclick="toggleDisciplinas('${aluno.ra}')" class="btn-add-disc" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 0.5rem; margin-top: 0; display: flex; align-items: center; gap: 0.25rem;">
+                            📖 Ver Disciplinas
+                        </button>
+                    </div>
+                    <div id="disciplinas-collapse-${aluno.ra}" style="display: none; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.25rem;">
+                        <div class="empty-state" style="padding: 0.5rem; font-size: 0.8rem;">Carregando disciplinas...</div>
+                    </div>
+                `;
+                alunosListContainer.appendChild(card);
+            });
+        }
+
+        // GET /alunos/:ra/disciplinas - Listar disciplinas dinamicamente
+        window.toggleDisciplinas = async (ra) => {
+            const container = document.getElementById(`disciplinas-collapse-${ra}`);
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            container.innerHTML = '<div class="empty-state" style="padding: 0.5rem; font-size: 0.8rem;">Carregando disciplinas...</div>';
+
+            try {
+                // Chamada exata para o endpoint GET /alunos/:ra/disciplinas
+                const res = await fetch(`${ALUNO_API_URL}/${ra}/disciplinas`);
+                if (!res.ok) throw new Error();
+                const disciplinas = await res.json();
+                
+                if (disciplinas.length === 0) {
+                    container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-muted); padding: 0.25rem; font-style: italic;">Nenhuma disciplina matriculada.</p>';
+                    return;
+                }
+
+                let html = '<div style="display: flex; flex-direction: column; gap: 0.35rem;">';
+                disciplinas.forEach(d => {
+                    html += `
+                        <div class="disc-pill">
+                            <div>
+                                <span class="disc-pill-code">${d.codigo}</span>
+                                <span class="disc-pill-name">${d.nome}</span>
+                            </div>
+                            <span class="disc-pill-prof">${d.professor}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p style="font-size: 0.85rem; color: var(--danger); padding: 0.25rem;">Erro ao obter disciplinas do aluno.</p>';
+            }
+        };
+
+        // GET /alunos/:ra - Buscar Aluno por RA
+        btnSearchRa.addEventListener('click', async () => {
+            const ra = searchRaInput.value.trim();
+            if (!ra) {
+                fetchAlunos();
+                return;
+            }
+
+            alunosListContainer.innerHTML = '<div class="empty-state">Buscando aluno por RA...</div>';
+
+            try {
+                const res = await fetch(`${ALUNO_API_URL}/${ra}`);
+                if (res.status === 404) {
+                    alunosListContainer.innerHTML = `<div class="empty-state" style="color: var(--danger); font-weight: 600;">Nenhum aluno encontrado com o RA "${ra}".</div>`;
+                    return;
+                }
+                if (!res.ok) throw new Error();
+
+                const aluno = await res.json();
+                renderAlunos([aluno]);
+                // Abre automaticamente as disciplinas do aluno buscado
+                toggleDisciplinas(aluno.ra);
+            } catch (error) {
+                alunosListContainer.innerHTML = '<div class="empty-state" style="color: var(--danger);">Erro na comunicação com a API.</div>';
+            }
+        });
+
+        btnClearSearch.addEventListener('click', () => {
+            searchRaInput.value = '';
+            fetchAlunos();
+        });
+
+        // Edição de Aluno - Carrega no Form
+        window.editAluno = async (ra) => {
+            try {
+                // Busca as informações mais recentes do aluno
+                const res = await fetch(`${ALUNO_API_URL}/${ra}`);
+                if (!res.ok) throw new Error();
+                const aluno = await res.json();
+
+                isEditingAluno = true;
+                alunoRaInput.value = aluno.ra;
+                alunoRaInput.readOnly = true; // RA não deve ser alterado ao atualizar
+                alunoNomeInput.value = aluno.nome;
+                
+                activeDisciplines = JSON.parse(JSON.stringify(aluno.disciplinas || []));
+                renderDisciplineFields();
+
+                alunoFormTitle.textContent = `Editar Aluno (RA: ${ra})`;
+                alunoSubmitBtn.textContent = "Salvar Alterações";
+                alunoCancelBtn.style.display = "block";
+
+                // Rolar suavemente para o formulário
+                document.getElementById('form-panel').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                alert("Erro ao buscar dados do aluno.");
+            }
+        };
+
+        function renderDisciplineFields() {
+            disciplinasListFields.innerHTML = '';
+            
+            if (activeDisciplines.length === 0) {
+                disciplinasListFields.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-bottom: 0.5rem;">Nenhuma disciplina adicionada.</p>';
+                return;
+            }
+
+            activeDisciplines.forEach((d, index) => {
+                const row = document.createElement('div');
+                row.className = 'disciplina-row';
+                row.innerHTML = `
+                    <input type="text" placeholder="Código" value="${d.codigo || ''}" style="width: 25%;" onchange="updateDisciplineValue(${index}, 'codigo', this.value)" required>
+                    <input type="text" placeholder="Nome" value="${d.nome || ''}" style="width: 45%;" onchange="updateDisciplineValue(${index}, 'nome', this.value)" required>
+                    <input type="text" placeholder="Professor" value="${d.professor || ''}" style="width: 30%;" onchange="updateDisciplineValue(${index}, 'professor', this.value)" required>
+                    <button type="button" class="btn-remove-disc" onclick="removeDisciplineField(${index})" title="Remover">✕</button>
+                `;
+                disciplinasListFields.appendChild(row);
+            });
+        }
+
+        window.updateDisciplineValue = (index, field, value) => {
+            if (activeDisciplines[index]) {
+                activeDisciplines[index][field] = value;
+            }
+        };
+
+        window.removeDisciplineField = (index) => {
+            activeDisciplines.splice(index, 1);
+            renderDisciplineFields();
+        };
+
+        btnAddDisciplina.addEventListener('click', () => {
+            activeDisciplines.push({ codigo: '', nome: '', professor: '' });
+            renderDisciplineFields();
+        });
+
+        // Envio do Form de Aluno (PUT /alunos/:ra)
+        alunoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const ra = alunoRaInput.value.trim();
+            const payload = {
+                nome: alunoNomeInput.value.trim(),
+                disciplinas: activeDisciplines
+            };
+
+            try {
+                // Chamada exata para o endpoint PUT /alunos/:ra
+                const res = await fetch(`${ALUNO_API_URL}/${ra}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert("Erro ao salvar alterações: " + (data.message || 'Erro desconhecido'));
+                    return;
+                }
+
+                alert("Aluno atualizado com sucesso!");
+                resetAlunoForm();
+                fetchAlunos();
+            } catch (error) {
+                alert("Erro ao comunicar com o servidor.");
+            }
+        });
+
+        alunoCancelBtn.addEventListener('click', resetAlunoForm);
+
+        function resetAlunoForm() {
+            isEditingAluno = false;
+            alunoForm.reset();
+            alunoRaInput.readOnly = false;
+            activeDisciplines = [];
+            renderDisciplineFields();
+            
+            alunoFormTitle.textContent = "Atualizar Aluno";
+            alunoSubmitBtn.textContent = "Salvar Alterações";
+            alunoCancelBtn.style.display = "none";
+        }
+
+        // Inicialização
+        fetchUsers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<div class="header-container">
+  <h1>Detalhes do Aluno</h1>
+  <p class="subtitle">Visualização das informações gerais e resumo de disciplinas do estudante.</p>
+</div>
+
+<!-- Carregando -->
+<div *ngIf="isLoading" class="loader-container">
+  <div class="spinner"></div>
+  <p>Carregando dados...</p>
+</div>
+
+<!-- Mensagem de Erro -->
+<div *ngIf="errorMessage" class="error-panel">
+  <h3>Erro ao carregar detalhes</h3>
+  <p>{{ errorMessage }}</p>
+  <a routerLink="/alunos" class="action-btn detail-btn" style="width: auto; display: inline-flex; padding: 0.6rem 1.5rem;">
+    Voltar para a lista
+  </a>
+</div>
+
+<!-- Detalhes do Aluno -->
+<div *ngIf="!isLoading && !errorMessage && aluno" class="detail-container">
+  
+  <div class="profile-card">
+    <div class="profile-meta">
+      <h2>{{ aluno.nome }}</h2>
+      <p class="ra-label">RA: {{ aluno.ra }}</p>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <!-- Informacoes Gerais -->
+    <div class="info-block glass-panel">
+      <h3>Informações Gerais</h3>
+      <div class="info-row">
+        <span class="label">Registro Acadêmico (RA):</span>
+        <span class="value">{{ aluno.ra }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Nome:</span>
+        <span class="value">{{ aluno.nome }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Quantidade de disciplinas:</span>
+        <span class="value-highlight">{{ aluno.disciplinas.length }}</span>
+      </div>
+    </div>
+
+    <!-- Disciplinas Relacionadas -->
+    <div class="info-block glass-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Disciplinas Relacionadas</h3>
+        <a [routerLink]="['/alunos', aluno.ra, 'disciplinas']" class="link-view-all">Ver detalhes completo</a>
+      </div>
+
+      <div *ngIf="aluno.disciplinas.length === 0" class="empty-disciplines">
+        Nenhuma disciplina vinculada a este aluno.
+      </div>
+
+      <div *ngIf="aluno.disciplinas.length > 0" class="disciplines-summary-list">
+        <div *ngFor="let disc of aluno.disciplinas" class="disc-summary-item">
+          <span class="disc-code">{{ disc.codigo }}</span>
+          <span class="disc-name">{{ disc.nome }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botoes de Navegacao -->
+  <div class="navigation-footer">
+    <a routerLink="/alunos" class="btn-nav back">
+      Voltar
+    </a>
+    <a [routerLink]="['/alunos', aluno.ra, 'editar']" class="btn-nav edit">
+      Editar Aluno
+    </a>
+  </div>
+
+</div>

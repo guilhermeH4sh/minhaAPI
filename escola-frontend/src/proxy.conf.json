@@ -1,0 +1,8 @@
+{
+  "/alunos": {
+    "target": "https://two0261-frontend.onrender.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

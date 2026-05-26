@@ -1,0 +1,59 @@
+<div class="header-container">
+  <h1>Disciplinas do Aluno</h1>
+  <p class="subtitle" *ngIf="aluno">Grade de disciplinas do aluno(a) <strong>{{ aluno.nome }}</strong> (RA: {{ ra }})</p>
+  <p class="subtitle" *ngIf="!aluno">Grade de disciplinas do aluno (RA: {{ ra }})</p>
+</div>
+
+<!-- Carregando -->
+<div *ngIf="isLoading" class="loader-container">
+  <div class="spinner"></div>
+  <p>Carregando disciplinas...</p>
+</div>
+
+<!-- Erro -->
+<div *ngIf="errorMessage" class="error-panel">
+  <h3>Erro ao carregar</h3>
+  <p>{{ errorMessage }}</p>
+  <a [routerLink]="['/alunos', ra]" class="action-btn detail-btn" style="width: auto; display: inline-flex; padding: 0.6rem 1.5rem;">
+    Voltar para detalhes
+  </a>
+</div>
+
+<!-- Lista de Disciplinas -->
+<div *ngIf="!isLoading && !errorMessage" class="disciplines-container">
+  
+  <div *ngIf="disciplinas.length === 0" class="empty-disciplines">
+    <p>O aluno não possui disciplinas matriculadas.</p>
+  </div>
+
+  <div *ngIf="disciplinas.length > 0" class="table-wrapper glass-panel">
+    <table class="disciplines-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nome da disciplina</th>
+          <th>Professor responsável</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let disc of disciplinas" class="table-row">
+          <td>
+            <span class="code-badge">{{ disc.codigo }}</span>
+          </td>
+          <td class="disc-name-cell">{{ disc.nome }}</td>
+          <td class="prof-name-cell">
+            {{ disc.professor }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Botoes de Navegacao -->
+  <div class="navigation-footer">
+    <a [routerLink]="['/alunos', ra]" class="btn-nav back">
+      Voltar para detalhes
+    </a>
+  </div>
+
+</div>
