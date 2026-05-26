@@ -21,7 +21,7 @@
 <!-- Formulario de Edicao -->
 <form *ngIf="!isLoading && aluno" (ngSubmit)="salvar()" #form="ngForm" class="edit-form-container">
   
-  <div class="form-card glass-panel">
+  <div class="form-card">
     <h3>Dados do Aluno</h3>
     
     <div class="form-row">
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div class="form-card glass-panel">
+  <div class="form-card">
     <div class="card-header-flex">
       <h3>Disciplinas</h3>
       <button type="button" class="btn-add-disc" (click)="adicionarDisciplina()">

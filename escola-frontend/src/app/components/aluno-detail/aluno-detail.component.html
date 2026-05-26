@@ -30,7 +30,7 @@
 
   <div class="info-grid">
     <!-- Informacoes Gerais -->
-    <div class="info-block glass-panel">
+    <div class="info-block">
       <h3>Informações Gerais</h3>
       <div class="info-row">
         <span class="label">Registro Acadêmico (RA):</span>
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Disciplinas Relacionadas -->
-    <div class="info-block glass-panel">
+    <div class="info-block">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <h3>Disciplinas Relacionadas</h3>
         <a [routerLink]="['/alunos', aluno.ra, 'disciplinas']" class="link-view-all">Ver detalhes completo</a>
@@ -73,7 +73,7 @@
     </a>
     <a [routerLink]="['/alunos', aluno.ra, 'editar']" class="btn-nav edit">
       Editar Aluno
-    </a>
+        </a>
   </div>
 
 </div>
